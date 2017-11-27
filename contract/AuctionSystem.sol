@@ -15,29 +15,33 @@ contract Auction{
     
     function Auction() public{
         organizer = msg.sender;
+        //Adding Organizer to User
+        Users[organizer].name = "Admin";
+        Users[organizer].coins = 0;
+        userExist[organizer] = true;
     }
     
     struct Item{
         string name;
         uint256 cost;
-        address ownerAdress;
+        address ownerAddress;
     }
     
     struct User{
         string name;
-        //item id is mapped to item
-        mapping(uint256=>Item) itemsOwned;
+        mapping(uint256=>Item) itemsOwned; //item id is mapped to item
         uint256 coins;
         uint256 numberItemsOwned;
     }
     
     
     //only organizer can add Items
-    function addItemToAuction(string name, uint256 cost) public{
+    function addItemToAuction(string name, uint256 cost, address ownerAddress) public{
         if(msg.sender == organizer){
             totalItems = totalItems + 1;
             AuctionPot[totalItems].name = name;
             AuctionPot[totalItems].cost = cost;
+            AuctionPot[totalItems].ownerAddress = ownerAddress;
         }
         else throw;
     }
@@ -58,6 +62,7 @@ contract Auction{
             AuctionPot[itemID].ownerAdress = userAddress;   //updating item ownerAdress
             i2r[user.numberItemsOwned - 1] = itemID;
             user.coins -= AuctionPot[itemID].cost;
+            Users[organizer].coins += AuctionPot[itemID].cost; //adding money to organizer
         }
         else throw;
     }
